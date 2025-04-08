@@ -3,7 +3,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <title>Wereldkaart Quiz - Volledige Reeks</title>
+  <title>Wereldkaart Quiz</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f8ff; margin: 0; padding: 0; }
     h1 { margin-top: 20px; }
@@ -59,11 +59,8 @@
 </head>
 <body>
   <h1>Wereldkaart Quiz</h1>
-  <p>Klik op "Start Quiz" om te beginnen met alle 51 vragen.</p>
-  <button onclick="startQuiz()">Start Quiz</button>
-
   <div class="container">
-    <div id="quiz-box" style="display:none;">
+    <div id="quiz-box">
       <h2>Welk land en hoofdstad hoort bij nummer <span id="vraag-nummer"></span>?</h2>
       <input type="text" id="land" placeholder="Land"><br>
       <input type="text" id="hoofdstad" placeholder="Hoofdstad"><br>
@@ -72,61 +69,87 @@
     </div>
     <img src="wereldkaart landen hoofdsteden.jpg" alt="Wereldkaart">
   </div>
-
   <div id="score"></div>
 
   <script>
     const antwoorden = {
-      1: ["Canada", "Ottawa"], 2: ["Verenigde Staten", "Washington D.C."], 3: ["Mexico", "Mexico-Stad"],
-      4: ["Colombia", "Bogotá"], 5: ["Venezuela", "Caracas"], 6: ["Brazilië", "Brasília"],
-      7: ["Peru", "Lima"], 8: ["Bolivia", "Sucre"], 9: ["Paraguay", "Asunción"],
-      10: ["Argentinië", "Buenos Aires"], 11: ["Portugal", "Lissabon"], 12: ["Spanje", "Madrid"],
-      13: ["Frankrijk", "Parijs"], 14: ["Zwitserland", "Bern"], 15: ["Italië", "Rome"],
-      16: ["Marokko", "Rabat"], 17: ["Algerije", "Algiers"], 18: ["Tunesië", "Tunis"],
-      19: ["Libië", "Tripoli"], 20: ["Egypte", "Caïro"], 21: ["Israël", "Jeruzalem"],
-      22: ["Palestina", "Ramallah"], 23: ["Soedan", "Khartoem"], 24: ["Eritrea", "Asmara"],
-      25: ["Ethiopië", "Addis Abeba"], 26: ["Somalië", "Mogadishu"], 27: ["Nigeria", "Abuja"],
-      28: ["Democratische Republiek Congo", "Kinshasa"], 29: ["Zuid-Afrika", "Pretoria"], 30: ["Mali", "Bamako"],
-      31: ["Senegal", "Dakar"], 32: ["Gambia", "Banjul"], 33: ["Guinee", "Conakry"],
-      34: ["Ivoorkust", "Yamoussoukro"], 35: ["Ghana", "Accra"], 36: ["Angola", "Luanda"],
-      37: ["Noorwegen", "Oslo"], 38: ["Duitsland", "Berlijn"], 39: ["Rusland", "Moskou"],
-      40: ["Irak", "Bagdad"], 41: ["Iran", "Teheran"], 42: ["Pakistan", "Islamabad"],
-      43: ["India", "New Delhi"], 44: ["Bangladesh", "Dhaka"], 45: ["Vietnam", "Hanoi"],
-      46: ["Thailand", "Bangkok"], 47: ["China", "Peking"], 48: ["Japan", "Tokio"],
-      49: ["Indonesië", "Jakarta"], 50: ["Australië", "Canberra"], 51: ["Nieuw-Zeeland", "Wellington"]
+      1: ["Canada", "Ottawa"],
+      2: ["Verenigde Staten", "Washington D.C."],
+      3: ["Mexico", "Mexico-Stad"],
+      4: ["Colombia", "Bogotá"],
+      5: ["Venezuela", "Caracas"],
+      6: ["Brazilië", ['Brasília', 'Brasilia']],
+      7: ["Peru", "Lima"],
+      8: ["Bolivia", "Sucre"],
+      9: ["Chili", "Santiago"],
+      10: ["Argentinië", "Buenos Aires"],
+      11: ["Marokko", "Rabat"],
+      12: ["Algerije", "Algiers"],
+      13: ["Tunesië", "Tunis"],
+      14: ["Libië", "Tripoli"],
+      15: ["Egypte", "Cairo"],
+      16: ["Brazilië", ['Brasília', 'Brasilia']],
+      17: ["Mali", "Bamako"],
+      18: ["Tsjaad", "Ndjamena"],
+      19: ["Chili", "Santiago"],
+      20: ["Sudan", "Khartoum"],
+      21: ["Zuid-Sudan", "Juba"],
+      22: ["Ethiopië", "Addis Adeba"],
+      23: ["Nigeria", "Abuja"],
+      24: ["Democratische Republiek Congo", "Kinshasa"],
+      25: ["Kenia", "Nairobi"],
+      26: ["Brazilië", ['Brasília', 'Brasilia']],
+      27: ["Angola", "Luanda"],
+      28: ["Mozambique", "Maputo"],
+      29: ["Zuid-Afrika", "Pretoria"],
+      30: ["Turkije", "Ankara"],
+      31: ["Israël", "Jeruzalem"],
+      32: ["Syrië", "Damaskus"],
+      33: ["Jordanië", "Amman"],
+      34: ["Irak", "Bagdad"],
+      35: ["Iran", "Teheran"],
+      36: ["Brazilië", ['Brasília', 'Brasilia']],
+      37: ["Rusland", "Moskou"],
+      38: ["Oekraïne", "Kiev"],
+      39: ["Kazachstan", "Astana"],
+      40: ["Afghanistan", "Kabul"],
+      41: ["Pakistan", "Islamabad"],
+      42: ["India", "New Delhi"],
+      43: ["Myanmar", "Rangoon"],
+      44: ["Thailand", "Bangkok"],
+      45: ["Indonesië", "Jakarta"],
+      46: ["Brazilië", ['Brasília', 'Brasilia']],
+      47: ["Filipijnen", "Manila"],
+      48: ["China", "Beijing"],
+      49: ["Japan", "Tokyo"],
+      50: ["Australië", "Canberra"],
+      51: ["Nieuw-Zeeland", "Wellington"]
     };
 
     let scoreGoed = 0;
     let scoreFout = 0;
-    let huidigeNummer = null;
+    let huidigeNummer = 0;
+    let nummersOver = [...Array(51).keys()].map(i => i + 1);
     let tweedeKans = false;
-    let teBeantwoorden = [];
 
     function normalize(text) {
       return text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
     }
 
-    function startQuiz() {
-      const nummers = Array.from({ length: 51 }, (_, i) => i + 1);
-      teBeantwoorden = nummers.sort(() => Math.random() - 0.5);
-      scoreGoed = 0;
-      scoreFout = 0;
-      volgendeVraag();
-    }
-
     function volgendeVraag() {
-      if (teBeantwoorden.length === 0) {
-        document.getElementById("feedback").textContent = "🎉 Je hebt alle vragen gehad!";
-        document.getElementById("quiz-box").style.display = "none";
+      if (nummersOver.length === 0) {
+        document.getElementById("quiz-box").innerHTML = "<h2>Quiz voltooid!</h2><p>Score: " + scoreGoed + " goed, " + scoreFout + " fout.</p>";
         return;
       }
-      tweedeKans = false;
-      huidigeNummer = teBeantwoorden.shift();
+      const index = Math.floor(Math.random() * nummersOver.length);
+      huidigeNummer = nummersOver.splice(index, 1)[0];
       document.getElementById("vraag-nummer").textContent = huidigeNummer;
       document.getElementById("land").value = "";
       document.getElementById("hoofdstad").value = "";
-      document.getElementById("feedback").textContent = "";
       document.getElementById("quiz-box").style.display = "block";
+      document.getElementById("feedback").textContent = "";
+      tweedeKans = false;
+
       if ([1, 2, 3].includes(huidigeNummer)) {
         document.getElementById("quiz-box").style.left = "auto";
         document.getElementById("quiz-box").style.right = "10px";
@@ -134,36 +157,32 @@
         document.getElementById("quiz-box").style.right = "auto";
         document.getElementById("quiz-box").style.left = "10px";
       }
-
     }
 
     function controleerAntwoord() {
       const land = normalize(document.getElementById("land").value.trim());
       const hoofdstad = normalize(document.getElementById("hoofdstad").value.trim());
       const [correctLand, correctHoofdstad] = antwoorden[huidigeNummer].map(normalize);
-      const feedback = document.getElementById("feedback");
 
       if (land === correctLand && hoofdstad === correctHoofdstad) {
         scoreGoed++;
-        feedback.textContent = "✅ Alles correct!";
-        updateScore();
+        document.getElementById("feedback").textContent = "✅ Alles correct!";
+        document.getElementById("score").innerHTML = `Score: ${scoreGoed} goed, ${scoreFout} fout.`;
         setTimeout(volgendeVraag, 1000);
       } else if (!tweedeKans) {
         tweedeKans = true;
         document.getElementById("land").value = "";
         document.getElementById("hoofdstad").value = "";
-        feedback.textContent = "❌ Niet correct, probeer het nog eens.";
+        document.getElementById("feedback").textContent = "❌ Niet correct, probeer het nog eens.";
       } else {
         scoreFout++;
-        feedback.innerHTML = `❌ Fout. Juist antwoord:<br><strong>${antwoorden[huidigeNummer][0]} - ${antwoorden[huidigeNummer][1]}</strong>`;
-        updateScore();
-        setTimeout(volgendeVraag, 3000);
+        document.getElementById("feedback").textContent = `❌ Fout. Juist antwoord: ${antwoorden[huidigeNummer][0]} - ${antwoorden[huidigeNummer][1]}`;
+        document.getElementById("score").innerHTML = `Score: ${scoreGoed} goed, ${scoreFout} fout.`;
+        setTimeout(volgendeVraag, 2000);
       }
     }
 
-    function updateScore() {
-      document.getElementById("score").innerHTML = `Score: ${scoreGoed} goed, ${scoreFout} fout.`;
-    }
+    window.onload = volgendeVraag;
   </script>
 </body>
 </html>
